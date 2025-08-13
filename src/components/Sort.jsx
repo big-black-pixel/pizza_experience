@@ -1,4 +1,5 @@
 import React from 'react'
+import axios from 'axios';
 import { useSelector, useDispatch,  } from 'react-redux';
 import { setSort } from '../redux/slices/filterSlice';
 
@@ -16,7 +17,7 @@ function Sort() {
     const sort = useSelector(state => state.filter.sort )
 
     const [open, setOpen] = React.useState(false)
-    
+
     const onClickListItem = (obj) => {
         dispatch(setSort(obj))
         setOpen(false)

@@ -5,6 +5,13 @@ import styles from "./Search.module.scss";
 
 const Search = () => {
   const {searchValue, setSearchValue} = React.useContext(SearchContext)
+  const inputRef = React.useRef()
+
+  const onClickClear = () => {
+    setSearchValue('');
+    inputRef.current.focus()
+  }
+
   return (
     <div className={styles.root}>
       <svg
@@ -24,7 +31,7 @@ const Search = () => {
         placeholder="Поиск пиццы ..."
       />
       {searchValue && <svg
-        onClick={() => setSearchValue('')}
+        onClick={onClickClear}
         className={styles.clearIcon}
         fill="none"
         height="24"
