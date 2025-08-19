@@ -22,15 +22,19 @@ function Sort() {
         dispatch(setSort(obj))
         setOpen(false)
     };
-    
-// Клик для скрытия сортировки
+
+    // Клик для скрытия сортировки
 
     React.useEffect(() => {
-        document.body.addEventListener('click', (event) => {
+        const handleClickOutside = (event) => {
             if (!event.composedPath().includes(sortRef.current)) {
                 setOpen(false)
             }
-        })
+        }
+        document.body.addEventListener('click', handleClickOutside)
+
+        return () => { document.body.removeEventListener('click', handleClickOutside) }
+
     }, [])
 
     return (
