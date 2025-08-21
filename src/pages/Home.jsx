@@ -2,7 +2,6 @@ import React from "react";
 import qs from 'qs'
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 import { setCategoryId, setCurrentPage, setFilters } from "../redux/slices/filterSlice";
 import Categories from "../components/Categories";
@@ -12,6 +11,7 @@ import Skeleton from "../components/PizzaBlock/Skeleton";
 import Pagination from "../components/Pagination";
 import { SearchContext } from "../App";
 import { sortList } from "../components/Sort";
+import {fetchPizzas } from "../redux/slices/pizzasSlice";
 
 const Home = () => {
   const navigate = useNavigate()
@@ -19,37 +19,36 @@ const Home = () => {
   const isSearch = React.useRef(false)
   const isMounted = React.useRef(false)
 
+  const {items, status} = useSelector((state) => state.pizza);
   const { categoryId, sort, currentPage } = useSelector((state) => state.filter);
+
 
   const onChangeCategory = (id) => {
     dispatch(setCategoryId(id));
   };
 
-  const [items, setItems] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(true);
   const { searchValue } = React.useContext(SearchContext);
 
   const onChangePage = number => {
     dispatch(setCurrentPage(number))
   }
 
-  const fetchPizzas = () => {
-    setIsLoading(true);
+  const getPizzas = async () => {
 
     const sortBy = sort.sortProperty.replace("-", "");
     const order = sort.sortProperty.includes("-") ? "asc" : "desc";
     const category = categoryId > 0 ? `category=${categoryId}` : "";
     const search = searchValue ? `&search=${searchValue}` : "";
 
-    axios
-      .get(
-        `https://6897007d250b078c2040b203.mockapi.io/pizzaDirect?page=${currentPage}&limit=4&${category}&sortBy=${sortBy}&order=${order}` +
-        search
-      )
-      .then((res) => {
-        setItems(res.data);
-        setIsLoading(false);
-      });
+    dispatch(fetchPizzas({
+      sortBy,
+      order,
+      category,
+      search,
+      currentPage,
+    }))
+
+    window.scrollTo(0, 0);
   }
 
   // Если изменили параметры и был первый рендер
@@ -61,11 +60,11 @@ const Home = () => {
         categoryId,
         currentPage,
       });
-
+      console.log(items)
       navigate(`?${queryString}`)
     }
     isMounted.current = true
-  }, [categoryId, sort.sortProperty, searchValue, currentPage])
+  }, [categoryId, sort.sortProperty, searchValue, currentPage,items])
 
   // Если был первый рендер, то проверяем URL-параметры и сохраняем в редуксе
 
@@ -88,10 +87,8 @@ const Home = () => {
   // Если был первый рендер, то запрашиваем пиццы
 
   React.useEffect(() => {
-    window.scrollTo(0, 0);
-
     if (!isSearch.current) {
-      fetchPizzas()
+      getPizzas()
     }
 
     isSearch.current = false
@@ -115,12 +112,12 @@ const Home = () => {
       <div className="content__top">
         <Categories
           value={categoryId}
-          onChangeCategory={(id) => onChangeCategory(id)} //          /////////////////////////////////////////////
+          onChangeCategory={(id) => onChangeCategory(id)}
         />
         <Sort />
       </div>
       <h2 className="content__title">Все пиццы</h2>
-      <div className="content__items">{isLoading ? skeletons : pizzas}</div>
+      <div className="content__items">{status === 'loading' ? skeletons : pizzas}</div>
       <Pagination currentPage={currentPage} onChangePage={onChangePage} />
     </div>
   );
