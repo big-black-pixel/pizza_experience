@@ -12,7 +12,7 @@ import Pagination from "../components/Pagination";
 import { sortList } from "../components/Sort";
 import {fetchPizzas, selectPizzaData } from "../redux/slices/pizzasSlice";
 
-const Home = () => {
+const Home: React.FC = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch();
   const isSearch = React.useRef(false)
@@ -22,13 +22,13 @@ const Home = () => {
   const { categoryId, sort, currentPage, searchValue } = useSelector(selectFilter);
 
 
-  const onChangeCategory = (id) => {
-    dispatch(setCategoryId(id));
+  const onChangeCategory = (idx: number) => {
+    dispatch(setCategoryId(idx));
   };
 
 
-  const onChangePage = number => {
-    dispatch(setCurrentPage(number))
+  const onChangePage = (page: number) => {
+    dispatch(setCurrentPage(page))
   }
 
   const getPizzas = async () => {
@@ -38,9 +38,11 @@ const Home = () => {
     const category = categoryId > 0 ? `category=${categoryId}` : "";
     const search = searchValue ? `&search=${searchValue}` : "";
 
-    dispatch(fetchPizzas({
+    dispatch(
+      // @ts-ignore
+      fetchPizzas({
       sortBy,
-      order,
+      order,                            /// ///////////////////////////////////////////////////////////////////////////////////////////
       category,
       search,
       currentPage,
@@ -69,7 +71,7 @@ const Home = () => {
     if (window.location.search) {
       const params = qs.parse(window.location.search.substring(1))
 
-      const sort = sortList.find(obj => obj.sortProperty === params.sortProperty)
+      const sort = sortList.find((obj) => obj.sortProperty === params.sortProperty)
 
       dispatch(
         setFilters({
@@ -93,12 +95,12 @@ const Home = () => {
   }, [categoryId, sort.sortProperty, searchValue, currentPage]);
 
   const pizzas = items
-    .filter((obj) => {
+    .filter((obj: any) => {                                                           /// ///////////////////////////////////////////
       return obj.title.toLowerCase().includes(searchValue.toLowerCase())
         ? true
         : false;
     })
-    .map((obj) => <Link key={obj.id} to = {`/pizza/${obj.id}`}>
+    .map((obj: any) => <Link key={obj.id} to = {`/pizza/${obj.id}`}>          {/*    ///////////////////////////////////////////////  */}
       <PizzaBlock {...obj} />
     </Link>);
 
@@ -111,7 +113,7 @@ const Home = () => {
       <div className="content__top">
         <Categories
           value={categoryId}
-          onChangeCategory={(id) => onChangeCategory(id)}
+          onChangeCategory={(id: number) => onChangeCategory(id)}  // //////????????????????????????????????????????????????????????
         />
         <Sort />
       </div>

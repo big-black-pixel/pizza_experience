@@ -2,7 +2,7 @@ import React from 'react'
 
 import stayls from './NotFaundBlock.module.scss';
 
-const NotFaundBlock = () => {
+const NotFaundBlock: React.FC = () => {
     return (
 
         <div className={stayls.root}>
